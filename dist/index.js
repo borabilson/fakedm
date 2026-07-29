@@ -44,9 +44,9 @@ var __plugin = (() => {
   var import_common = __require("@vendetta/metro/common");
   var import_plugin = __require("@vendetta/plugin");
   var import_toasts = __require("@vendetta/ui/toasts");
-  var UserStore = (0, import_metro.findByStoreLazy)("UserStore");
-  var SelectedChannelStore = (0, import_metro.findByStoreLazy)("SelectedChannelStore");
-  var ChannelStore = (0, import_metro.findByStoreLazy)("ChannelStore");
+  var UserStore = (0, import_metro.findByProps)("getUser", "getCurrentUser");
+  var SelectedChannelStore = (0, import_metro.findByProps)("getChannelId", "getVoiceChannelId");
+  var ChannelStore = (0, import_metro.findByProps)("getChannel", "getDMFromUserId");
   import_plugin.storage.fakes ??= [];
   var _idCounter = 0;
   function uniqueSnowflake(date) {
@@ -82,9 +82,9 @@ var __plugin = (() => {
   }
   function getCurrentDMChannel() {
     try {
-      const chId = SelectedChannelStore.getChannelId();
+      const chId = SelectedChannelStore?.getChannelId();
       if (!chId) return null;
-      const ch = ChannelStore.getChannel(chId);
+      const ch = ChannelStore?.getChannel(chId);
       if (!ch || ch.type !== 1 && ch.type !== 3) return null;
       return ch;
     } catch {
@@ -95,9 +95,9 @@ var __plugin = (() => {
     try {
       const ch = getCurrentDMChannel();
       if (!ch || ch.type !== 1) return null;
-      const me = UserStore.getCurrentUser();
+      const me = UserStore?.getCurrentUser();
       const otherId = ch.recipients?.find((id) => id !== me?.id);
-      return otherId ? UserStore.getUser(otherId) ?? null : null;
+      return otherId ? UserStore?.getUser(otherId) ?? null : null;
     } catch {
       return null;
     }
@@ -106,13 +106,13 @@ var __plugin = (() => {
     try {
       const ch = getCurrentDMChannel();
       if (!ch) return [];
-      const me = UserStore.getCurrentUser();
+      const me = UserStore?.getCurrentUser();
       const ids = ch.recipients ?? ch.rawRecipients?.map((r) => r.id) ?? [];
       const members = [];
       if (me) members.push(me);
       for (const id of ids) {
         if (id === me?.id) continue;
-        const u = UserStore.getUser(id);
+        const u = UserStore?.getUser(id);
         if (u) members.push(u);
       }
       return members;
@@ -232,12 +232,12 @@ var __plugin = (() => {
     if (!fakes || !fakes.length) return;
     for (const f of fakes) {
       if (f.type === "message") {
-        const author = UserStore.getUser(f.authorId);
+        const author = UserStore?.getUser(f.authorId);
         if (!author) continue;
         inject(f.channelId, author, f.content, new Date(f.timestamp), f.snowflakeId);
       } else {
-        const caller = UserStore.getUser(f.callerId);
-        const other = UserStore.getUser(f.otherId);
+        const caller = UserStore?.getUser(f.callerId);
+        const other = UserStore?.getUser(f.otherId);
         if (!caller || !other) continue;
         injectCall(
           f.channelId,
@@ -257,9 +257,9 @@ var __plugin = (() => {
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
   }
   function FakeDMModal({ visible, onClose }) {
-    const me = UserStore.getCurrentUser();
+    const me = UserStore?.getCurrentUser();
     const ch = getCurrentDMChannel();
-    const channelId = SelectedChannelStore.getChannelId();
+    const channelId = SelectedChannelStore?.getChannelId();
     const isGroup = ch?.type === 3;
     const other = getOtherUser();
     const members = getChannelMembers();
@@ -435,4 +435,4 @@ var __plugin = (() => {
   };
   return __toCommonJS(index_exports);
 })();
-__plugin.default || __plugin;
+module.exports = __plugin.default || __plugin;
