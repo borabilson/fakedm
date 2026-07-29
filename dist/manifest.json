@@ -1,7 +1,12 @@
 {
   "name": "FakeDM",
-  "description": "Injeta mensagens e chamadas locais falsas em DMs ou Grupos de DM no Kettu. Persiste entre reinicializações.",
-  "author": "Nightcord",
+  "description": "Injeta mensagens e chamadas locais falsas em DMs ou Grupos de DM no Kettu.",
+  "authors": [
+    {
+      "name": "Nightcord",
+      "id": "000000000000000000"
+    }
+  ],
   "main": "index.js",
-  "version": "1.0.0"
+  "vendetta": {}
 }
